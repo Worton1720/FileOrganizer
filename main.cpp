@@ -3,27 +3,27 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <stdexcept> // Добавлен заголовочный файл для std::runtime_error
-#include <windows.h> // Добавлен заголовочный файл для SetConsoleTextAttribute
+#include <stdexcept> // Р”РѕР±Р°РІР»РµРЅ Р·Р°РіРѕР»РѕРІРѕС‡РЅС‹Р№ С„Р°Р№Р» РґР»СЏ std::runtime_error
+#include <windows.h> // Р”РѕР±Р°РІР»РµРЅ Р·Р°РіРѕР»РѕРІРѕС‡РЅС‹Р№ С„Р°Р№Р» РґР»СЏ SetConsoleTextAttribute
 #include <shlobj.h>
 #include <ObjBase.h>
 #include "filesystem.hpp"
 #include "fs_std.hpp"
-// обращаться через fs::*
+// РѕР±СЂР°С‰Р°С‚СЊСЃСЏ С‡РµСЂРµР· fs::*
 #define FOREGROUND_YELLOW (FOREGROUND_RED | FOREGROUND_GREEN)
 #define FOREGROUND_WHITE (FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE)
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "ole32.lib")
 using namespace std;
 
-// Структура для хранения категорий и соответствующих расширений
+// РЎС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РєР°С‚РµРіРѕСЂРёР№ Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёС… СЂР°СЃС€РёСЂРµРЅРёР№
 struct Category
 {
     string name;
     vector<string> extensions;
 };
 
-// Список категорий
+// РЎРїРёСЃРѕРє РєР°С‚РµРіРѕСЂРёР№
 vector<Category> categories{
     {"Video", {".mp4", ".mov", ".avi", ".mkv", ".wmv", ".3gp", ".3g2", ".mpg", ".mpeg", ".m4v", ".h264", ".flv", ".rm", ".swf", ".vob"}},
     {"Code", {".py", ".js", ".html", ".jar", ".json", ".java", ".cpp", ".css", ".php"}},
@@ -39,11 +39,11 @@ vector<Category> categories{
     {"Backups", {".bak", ".bak2"}},
     {"Other", {}}};
 
-// Константы для более ясного кода
+// РљРѕРЅСЃС‚Р°РЅС‚С‹ РґР»СЏ Р±РѕР»РµРµ СЏСЃРЅРѕРіРѕ РєРѕРґР°
 const char PATH_SEPARATOR = '/';
 const string DEFAULT_CATEGORY = "Other";
 
-// Функция для создания категориальных папок
+// Р¤СѓРЅРєС†РёСЏ РґР»СЏ СЃРѕР·РґР°РЅРёСЏ РєР°С‚РµРіРѕСЂРёР°Р»СЊРЅС‹С… РїР°РїРѕРє
 void createCategoryFolders(const fs::path &folderPath)
 {
     for (const auto &cat : categories)
@@ -54,16 +54,16 @@ void createCategoryFolders(const fs::path &folderPath)
 }
 
 
-// Функция для перемещения файла в соответствующую папку
+// Р¤СѓРЅРєС†РёСЏ РґР»СЏ РїРµСЂРµРјРµС‰РµРЅРёСЏ С„Р°Р№Р»Р° РІ СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰СѓСЋ РїР°РїРєСѓ
 void moveFileToCategory(const fs::path &filePath)
 {
     try
     {
-        // Получаем имя файла и его расширение
+        // РџРѕР»СѓС‡Р°РµРј РёРјСЏ С„Р°Р№Р»Р° Рё РµРіРѕ СЂР°СЃС€РёСЂРµРЅРёРµ
         string fileName = filePath.filename().string();
         string extension = filePath.extension().string();
 
-        // Ищем категорию, соответствующую расширению файла
+        // РС‰РµРј РєР°С‚РµРіРѕСЂРёСЋ, СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰СѓСЋ СЂР°СЃС€РёСЂРµРЅРёСЋ С„Р°Р№Р»Р°
         auto it = find_if(categories.begin(), categories.end(),
                           [&](const Category &c)
                           {
@@ -72,7 +72,7 @@ void moveFileToCategory(const fs::path &filePath)
                                           extension) != c.extensions.end();
                           });
 
-        // Если категория не найдена, используем категорию по умолчанию
+        // Р•СЃР»Рё РєР°С‚РµРіРѕСЂРёСЏ РЅРµ РЅР°Р№РґРµРЅР°, РёСЃРїРѕР»СЊР·СѓРµРј РєР°С‚РµРіРѕСЂРёСЋ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
         Category *category = it != categories.end() ? &*it : nullptr;
 
         if (category == nullptr)
@@ -80,74 +80,74 @@ void moveFileToCategory(const fs::path &filePath)
             category = &categories.back();
         }
 
-        // Строим путь к новому месту файла
+        // РЎС‚СЂРѕРёРј РїСѓС‚СЊ Рє РЅРѕРІРѕРјСѓ РјРµСЃС‚Сѓ С„Р°Р№Р»Р°
         fs::path destPath = filePath.parent_path() / category->name;
 
-        // Исправляем слеши в пути (если необходимо)
+        // РСЃРїСЂР°РІР»СЏРµРј СЃР»РµС€Рё РІ РїСѓС‚Рё (РµСЃР»Рё РЅРµРѕР±С…РѕРґРёРјРѕ)
         destPath = destPath.make_preferred();
 
-        // Если папка не существует, создаем её
+        // Р•СЃР»Рё РїР°РїРєР° РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, СЃРѕР·РґР°РµРј РµС‘
         if (!fs::exists(destPath))
         {
             fs::create_directory(destPath);
         }
 
-        // Проверяем, не существует ли уже файл с таким именем в папке
+        // РџСЂРѕРІРµСЂСЏРµРј, РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚ Р»Рё СѓР¶Рµ С„Р°Р№Р» СЃ С‚Р°РєРёРј РёРјРµРЅРµРј РІ РїР°РїРєРµ
         for (int i = 1; fs::exists(destPath / fileName); ++i)
         {
             fileName = filePath.stem().string() + "_" + to_string(i) + extension;
         }
 
-        // Строим окончательный путь для файла
+        // РЎС‚СЂРѕРёРј РѕРєРѕРЅС‡Р°С‚РµР»СЊРЅС‹Р№ РїСѓС‚СЊ РґР»СЏ С„Р°Р№Р»Р°
         fs::path finalPath = destPath / fileName;
         finalPath = finalPath.make_preferred();
 
-        // Переименовываем файл
+        // РџРµСЂРµРёРјРµРЅРѕРІС‹РІР°РµРј С„Р°Р№Р»
         fs::rename(filePath, finalPath);
 
-        // Выводим информацию о перемещении файла
+        // Р’С‹РІРѕРґРёРј РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ РїРµСЂРµРјРµС‰РµРЅРёРё С„Р°Р№Р»Р°
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_BLUE);
         cout << "Move: " << fileName << " to " << category->name << endl;
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
     }
     catch (const exception &e)
     {
-        // Выводим сообщение об ошибке при возникновении исключения
+        // Р’С‹РІРѕРґРёРј СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ РїСЂРё РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РёСЃРєР»СЋС‡РµРЅРёСЏ
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
         cerr << "Error while moving file: " << e.what() << endl;
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
-        // Можно добавить дополнительные действия, такие как протоколирование или вывод пользователю
+        // РњРѕР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РґРµР№СЃС‚РІРёСЏ, С‚Р°РєРёРµ РєР°Рє РїСЂРѕС‚РѕРєРѕР»РёСЂРѕРІР°РЅРёРµ РёР»Рё РІС‹РІРѕРґ РїРѕР»СЊР·РѕРІР°С‚РµР»СЋ
     }
 }
 
-// Функция для рекурсивного удаления пустых папок в заданной директории
+// Р¤СѓРЅРєС†РёСЏ РґР»СЏ СЂРµРєСѓСЂСЃРёРІРЅРѕРіРѕ СѓРґР°Р»РµРЅРёСЏ РїСѓСЃС‚С‹С… РїР°РїРѕРє РІ Р·Р°РґР°РЅРЅРѕР№ РґРёСЂРµРєС‚РѕСЂРёРё
 void removeEmptyFolders(const fs::path &folderPath)
 {
     try
     {
-        // Проходим по всем элементам в текущей директории
+        // РџСЂРѕС…РѕРґРёРј РїРѕ РІСЃРµРј СЌР»РµРјРµРЅС‚Р°Рј РІ С‚РµРєСѓС‰РµР№ РґРёСЂРµРєС‚РѕСЂРёРё
         for (const auto &entry : fs::directory_iterator(folderPath))
         {
-            // Если текущий элемент является директорией
+            // Р•СЃР»Рё С‚РµРєСѓС‰РёР№ СЌР»РµРјРµРЅС‚ СЏРІР»СЏРµС‚СЃСЏ РґРёСЂРµРєС‚РѕСЂРёРµР№
             if (entry.is_directory())
             {
-                // Рекурсивно вызываем removeEmptyFolders для вложенной директории
+                // Р РµРєСѓСЂСЃРёРІРЅРѕ РІС‹Р·С‹РІР°РµРј removeEmptyFolders РґР»СЏ РІР»РѕР¶РµРЅРЅРѕР№ РґРёСЂРµРєС‚РѕСЂРёРё
                 removeEmptyFolders(entry.path());
             }
         }
 
-        // Проверяем, является ли текущая директория пустой
+        // РџСЂРѕРІРµСЂСЏРµРј, СЏРІР»СЏРµС‚СЃСЏ Р»Рё С‚РµРєСѓС‰Р°СЏ РґРёСЂРµРєС‚РѕСЂРёСЏ РїСѓСЃС‚РѕР№
         if (fs::is_empty(folderPath))
         {
-            // Получаем имя текущей категории из имени директории
+            // РџРѕР»СѓС‡Р°РµРј РёРјСЏ С‚РµРєСѓС‰РµР№ РєР°С‚РµРіРѕСЂРёРё РёР· РёРјРµРЅРё РґРёСЂРµРєС‚РѕСЂРёРё
             auto categoryName = folderPath.filename().string();
 
-            // Поиск соответствующей категории по имени
+            // РџРѕРёСЃРє СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РµР№ РєР°С‚РµРіРѕСЂРёРё РїРѕ РёРјРµРЅРё
             auto it = find_if(categories.begin(), categories.end(), [&](const Category &cat) {
                 return cat.name == categoryName;
             });
 
-            // Удаляем текущую директорию и выводим сообщение, если это не категориальная директория
+            // РЈРґР°Р»СЏРµРј С‚РµРєСѓС‰СѓСЋ РґРёСЂРµРєС‚РѕСЂРёСЋ Рё РІС‹РІРѕРґРёРј СЃРѕРѕР±С‰РµРЅРёРµ, РµСЃР»Рё СЌС‚Рѕ РЅРµ РєР°С‚РµРіРѕСЂРёР°Р»СЊРЅР°СЏ РґРёСЂРµРєС‚РѕСЂРёСЏ
             fs::remove_all(folderPath);
             if (it == categories.end())
             {
@@ -159,7 +159,7 @@ void removeEmptyFolders(const fs::path &folderPath)
     }
     catch (const exception &e)
     {
-        // Выводим сообщение об ошибке при возникновении исключения
+        // Р’С‹РІРѕРґРёРј СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ РїСЂРё РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РёСЃРєР»СЋС‡РµРЅРёСЏ
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
         cerr << "Error while removing empty folders: " << e.what() << endl;
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
@@ -167,15 +167,15 @@ void removeEmptyFolders(const fs::path &folderPath)
 }
 
 
-// Функция для сортировки файлов в папке
+// Р¤СѓРЅРєС†РёСЏ РґР»СЏ СЃРѕСЂС‚РёСЂРѕРІРєРё С„Р°Р№Р»РѕРІ РІ РїР°РїРєРµ
 void sortFiles(const fs::path &folderPath)
 {
     try
     {
-        // Создаем категориальные папки
+        // РЎРѕР·РґР°РµРј РєР°С‚РµРіРѕСЂРёР°Р»СЊРЅС‹Рµ РїР°РїРєРё
         createCategoryFolders(folderPath);
 
-        // Перемещаем файлы
+        // РџРµСЂРµРјРµС‰Р°РµРј С„Р°Р№Р»С‹
         for (const auto &entry : fs::directory_iterator(folderPath))
         {
             if (entry.is_regular_file())
@@ -184,12 +184,12 @@ void sortFiles(const fs::path &folderPath)
             }
         }
 
-        // Удаляем все пустые папки, кроме категориальных
+        // РЈРґР°Р»СЏРµРј РІСЃРµ РїСѓСЃС‚С‹Рµ РїР°РїРєРё, РєСЂРѕРјРµ РєР°С‚РµРіРѕСЂРёР°Р»СЊРЅС‹С…
         removeEmptyFolders(folderPath);
     }
     catch (const exception &e)
     {
-        // Выводим сообщение об ошибке при возникновении исключения
+        // Р’С‹РІРѕРґРёРј СЃРѕРѕР±С‰РµРЅРёРµ РѕР± РѕС€РёР±РєРµ РїСЂРё РІРѕР·РЅРёРєРЅРѕРІРµРЅРёРё РёСЃРєР»СЋС‡РµРЅРёСЏ
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_RED);
         cerr << "Error while sorting files: " << e.what() << endl;
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
@@ -198,7 +198,7 @@ void sortFiles(const fs::path &folderPath)
 
 fs::path getFolderPathFromExplorer()
 {
-    // Открытие диалогового окна проводника для выбора папки
+    // РћС‚РєСЂС‹С‚РёРµ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР° РїСЂРѕРІРѕРґРЅРёРєР° РґР»СЏ РІС‹Р±РѕСЂР° РїР°РїРєРё
     CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     IFileOpenDialog *pFileOpen;
 
@@ -210,7 +210,7 @@ fs::path getFolderPathFromExplorer()
         pFileOpen->GetOptions(&dwOptions);
         pFileOpen->SetOptions(dwOptions | FOS_PICKFOLDERS);
 
-        // Отображение диалогового окна
+        // РћС‚РѕР±СЂР°Р¶РµРЅРёРµ РґРёР°Р»РѕРіРѕРІРѕРіРѕ РѕРєРЅР°
         hr = pFileOpen->Show(NULL);
 
         if (SUCCEEDED(hr))
@@ -238,7 +238,7 @@ fs::path getFolderPathFromExplorer()
     }
 
     CoUninitialize();
-    return fs::path(); // Возвращаем пустой путь, если выбор папки отменен или произошла ошибка
+    return fs::path(); // Р’РѕР·РІСЂР°С‰Р°РµРј РїСѓСЃС‚РѕР№ РїСѓС‚СЊ, РµСЃР»Рё РІС‹Р±РѕСЂ РїР°РїРєРё РѕС‚РјРµРЅРµРЅ РёР»Рё РїСЂРѕРёР·РѕС€Р»Р° РѕС€РёР±РєР°
 }
 
 
@@ -250,16 +250,16 @@ int main()
     {
         system("cls");
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_YELLOW);
-        std::cout << "\n------- Начало работы -------\n";
+        std::cout << "\n------- РќР°С‡Р°Р»Рѕ СЂР°Р±РѕС‚С‹ -------\n";
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
 
 
-        std::cout << "Введите путь к папке.\n";
+        std::cout << "Р’РІРµРґРёС‚Рµ РїСѓС‚СЊ Рє РїР°РїРєРµ.\n";
         std::string mainPath = "";
 
         while (mainPath.empty())
         {
-            std::cout << "Путь к папке: ";
+            std::cout << "РџСѓС‚СЊ Рє РїР°РїРєРµ: ";
             std::getline(std::cin, mainPath);
 
             
@@ -273,57 +273,57 @@ int main()
                 if (result != S_OK)
                     std::cout << "Error: " << result << "\n";
                 else
-                    strcat_s(linkPathDef, "\\Downloads"); // Добавим к пути "Downloads"
+                    strcat_s(linkPathDef, "\\Downloads"); // Р”РѕР±Р°РІРёРј Рє РїСѓС‚Рё "Downloads"
 
                 mainPath = linkPathDef;
-                std::cout << "Выбрана папка Download!\n";
+                std::cout << "Р’С‹Р±СЂР°РЅР° РїР°РїРєР° Download!\n";
 
                 CoUninitialize();
             }
             else
             {
-                // Проверка наличия кавычек в начале и конце пути
+                // РџСЂРѕРІРµСЂРєР° РЅР°Р»РёС‡РёСЏ РєР°РІС‹С‡РµРє РІ РЅР°С‡Р°Р»Рµ Рё РєРѕРЅС†Рµ РїСѓС‚Рё
                 if (!mainPath.empty() && (mainPath.front() == '\"' || mainPath.front() == '\'') &&
                     (mainPath.back() == '\"' || mainPath.back() == '\''))
                 {
-                    // Убираем кавычки из начала и конца пути
+                    // РЈР±РёСЂР°РµРј РєР°РІС‹С‡РєРё РёР· РЅР°С‡Р°Р»Р° Рё РєРѕРЅС†Р° РїСѓС‚Рё
                     mainPath = mainPath.substr(1, mainPath.length() - 2);
                 }
             }
 
             if (!fs::path(mainPath).is_absolute())
             {
-                std::cout << "Введенный путь не является действительным. Попробуйте снова.\n";
+                std::cout << "Р’РІРµРґРµРЅРЅС‹Р№ РїСѓС‚СЊ РЅРµ СЏРІР»СЏРµС‚СЃСЏ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅС‹Рј. РџРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.\n";
                 mainPath = "";
                 continue;
             }
 
-            // Преобразуем строку в объект std::filesystem::path
+            // РџСЂРµРѕР±СЂР°Р·СѓРµРј СЃС‚СЂРѕРєСѓ РІ РѕР±СЉРµРєС‚ std::filesystem::path
             fs::path fsMainPath = mainPath;
 
-            // Преобразовываем путь к предпочтительному формату
+            // РџСЂРµРѕР±СЂР°Р·РѕРІС‹РІР°РµРј РїСѓС‚СЊ Рє РїСЂРµРґРїРѕС‡С‚РёС‚РµР»СЊРЅРѕРјСѓ С„РѕСЂРјР°С‚Сѓ
             fsMainPath.make_preferred();
 
-            // Добавлена проверка на существование папки
+            // Р”РѕР±Р°РІР»РµРЅР° РїСЂРѕРІРµСЂРєР° РЅР° СЃСѓС‰РµСЃС‚РІРѕРІР°РЅРёРµ РїР°РїРєРё
             if (!mainPath.empty() && !fs::exists(fsMainPath))
             {
                 cerr << "Error: Folder does not exist." << endl;
                 return 1;
             }
 
-            // Вызываем функцию сортировки, передавая std::filesystem::path
+            // Р’С‹Р·С‹РІР°РµРј С„СѓРЅРєС†РёСЋ СЃРѕСЂС‚РёСЂРѕРІРєРё, РїРµСЂРµРґР°РІР°СЏ std::filesystem::path
             sortFiles(fsMainPath);
 
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_YELLOW);
-            std::cout << "------- Конец работы -------\n";
+            std::cout << "------- РљРѕРЅРµС† СЂР°Р±РѕС‚С‹ -------\n";
             SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
         }
 
-        std::cout << "\nЖелаете продолжить? (y/n): ";
+        std::cout << "\nР–РµР»Р°РµС‚Рµ РїСЂРѕРґРѕР»Р¶РёС‚СЊ? (y/n): ";
         std::string choice;
         std::getline(std::cin, choice);
 
-        if (choice != "y" && choice != "н")
+        if (choice != "y" && choice != "РЅ")
         {
             system("cls");
             break;
@@ -332,6 +332,3 @@ int main()
 
     return 0;
 }
-
-
-
