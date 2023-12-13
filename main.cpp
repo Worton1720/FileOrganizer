@@ -254,7 +254,7 @@ int main()
         SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_WHITE);
 
 
-        std::cout << "Введите путь к папке.\n";
+        std::cout << "Введите путь к папке. Нажмите enter для выбора папки Download. \n";
         std::string mainPath = "";
 
         while (mainPath.empty())
