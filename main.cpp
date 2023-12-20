@@ -268,7 +268,7 @@ int main()
                 CoInitialize(nullptr);
 
                 CHAR linkPathDef[MAX_PATH];
-                HRESULT result = SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, linkPathDef);
+                HRESULT result = SHGetFolderPathA(NULL, CSIDL_PROFILE, NULL, SHGFP_TYPE_CURRENT, linkPathDef);
 
                 if (result != S_OK)
                     std::cout << "Error: " << result << "\n";
@@ -291,6 +291,7 @@ int main()
                 }
             }
 
+            cout << mainPath << endl;
             if (!fs::path(mainPath).is_absolute())
             {
                 std::cout << "Введенный путь не является действительным. Попробуйте снова.\n";
